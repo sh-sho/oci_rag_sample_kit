@@ -20,7 +20,7 @@ if __name__ == "__main__":
                     CREATE TABLE {td.table1_name}
                     (
                         {td.table1_index["index_id"]} NUMBER(9,0),
-                        {td.table1_index["index_name"]} VARCHAR2(1000 BYTE)
+                        {td.table1_index["index_name"]} VARCHAR2(100 BYTE)
                     )
                 """
                 

@@ -5,8 +5,6 @@ import numpy as np
 from langchain_community.document_loaders import UnstructuredFileLoader
 
 import table_detail as td
-import data.sample_data as sd
-
 
 _ = load_dotenv(find_dotenv())
 oracledb.init_oracle_client()
