@@ -35,8 +35,8 @@ CSV_DIRECTORY_PATH = os.environ["CSV_DIRECTORY_PATH"]
 NO_OF_PROCESSORS = mp.cpu_count()
 BATCH_SIZE = 96
 CHUNK_SIZE = 400
-CHUNK_OVERLAP = 10
-    
+CHUNK_OVERLAP = 40
+
 pool = oracledb.create_pool(user=UN, password=PW, dsn=DSN, min=NO_OF_PROCESSORS, max=NO_OF_PROCESSORS)
 
 text_splitter = RecursiveCharacterTextSplitter(
@@ -59,7 +59,8 @@ def timer(func: F) -> None:
         return result
     return wrapper
 
-def auth_check():
+def auth_check() -> None:
+    """ checks OCI Auth"""
     config = oci.config.from_file(file_location=os.environ["OCI_CONFIG_FILE"])
     compute_client = oci.core.ComputeClient(config)
     auth_response = compute_client.list_instances(OCI_COMPARTMENT_ID)
@@ -69,7 +70,8 @@ def auth_check():
     else:
         print(f"Auth Success\n Status:{auth_response.status}")
 
-def csv_dir_check():
+def csv_dir_check() -> None:
+    """ Check CSV directory """
     if os.path.exists(CSV_DIRECTORY_PATH):
         try:
             delete_csv_files(CSV_DIRECTORY_PATH)
@@ -84,7 +86,8 @@ def csv_dir_check():
         except Exception as e:
             print("Error make dirctory ", e)
 
-def delete_csv_files(csv_directory):
+def delete_csv_files(csv_directory: str) -> None:
+    """ Delete all CSV files """
     files = os.listdir(csv_directory)
     try:
         for file in files:
@@ -95,7 +98,8 @@ def delete_csv_files(csv_directory):
     except Exception as e:
         print("Error delete csv", e)
 
-def delete_dir():
+def delete_dir() -> None:
+    """ Delete CSV directory """
     if os.path.exists(CSV_DIRECTORY_PATH):
         try:
             shutil.rmtree(CSV_DIRECTORY_PATH)
@@ -103,12 +107,8 @@ def delete_dir():
         except Exception as e:
             print("Error delete directory", e)
 
-@timer
-def embed_text(texts):
-    text_vector = utils.embed_documents(texts)
-    return text_vector
-
-def fetch_data_from_db(connection, table_name, table_index):
+def fetch_data_from_db(connection: oracledb.Connection, table_name: str, table_index: dict) -> np.ndarray:
+    """ Fetch data from Database """
     engine = create_engine("oracle+oracledb://", creator=lambda: connection)
     select_sql = f"""
         SELECT {table_index["index_id"]}, {table_index["index_docs"]}
@@ -118,7 +118,8 @@ def fetch_data_from_db(connection, table_name, table_index):
     fetch_data = pd.read_sql(select_sql, engine)
     return fetch_data
 
-def split_text_to_chunks(df, table_index, chunk_columns):
+def split_text_to_chunks(df: np.ndarray, table_index: str, chunk_columns: list) -> np.ndarray:
+    """ Text to chunks """
     all_chunks = []
     for _, row in df.iterrows():
         chunks = text_splitter.split_text(row[table_index["index_docs"].lower()])
@@ -129,6 +130,7 @@ def split_text_to_chunks(df, table_index, chunk_columns):
 
 @timer
 def fetch_batches() -> np.ndarray:
+    """ Data fetch and transform to chunks """
     with pool.acquire() as connection:
         df_select = fetch_data_from_db(connection, td.table2_name, td.table2_index)
         
@@ -149,9 +151,15 @@ def fetch_batches() -> np.ndarray:
         print(f"Fetched all data: {len(df_chunks)}")
         return batches
 
+@timer
+def embed_text(texts: np.ndarray) -> np.ndarray:
+    """ Text to Vector """
+    text_vector = utils.embed_documents(texts)
+    return text_vector
 
 @timer
-def handle_chunk(batch):
+def handle_chunk(batch: np.ndarray) -> None:
+    """chunks to Vector and CSV"""
     print(f"handle_chunk {batch}")
 
     try:
@@ -189,18 +197,6 @@ def finalizer(exception: Exception, cursor: oracledb.Cursor, connection: oracled
     cursor.close()
     connection.close()
     exit(1)
-
-@timer
-def insert_columns(chunk, table_name):
-    with pool.acquire() as connection:
-        connection.autocommit = True
-        with connection.cursor():
-            engine = create_engine("oracle+oracledb://", creator=lambda: connection)
-            print(chunk)
-            try:
-                chunk.to_sql(table_name, con=engine,  index=False, if_exists='append')
-            except Exception as e:
-                print("Error insert_columns:", e)
 
 @timer
 def flush(data: list) -> None:

@@ -8,7 +8,6 @@ def chat_response(prompt: str) -> str:
     chat_api_response = requests.get(url=chat_api_url, params=chat_api_params)
     return chat_api_response.text
 
-# doc = "autonomous-database-self-securing-wp-ja.pdf"
 chat_doc_api_url = "http://localhost:8000/chat_doc/"
 def chat_doc_response(prompt: str) -> str:
     doc = doc_search(prompt=prompt)

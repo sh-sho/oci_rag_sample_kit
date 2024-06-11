@@ -11,11 +11,10 @@ oracledb.init_oracle_client()
 UN = os.environ.get("UN")
 PW = os.environ.get("PW")
 DSN = os.environ.get("DSN")
-pdf_directory = './data/'
-# pdf_directory = '/home/ubuntu/oci_script/o_sample/chunk_rag_code/data/'
+PDF_DIRECTORY = os.environ.get("PDF_DIRECTORY_PATH")
 
 def doc_loader(pdf_path: str) -> np.ndarray:
-    loader = UnstructuredFileLoader(pdf_directory + pdf_path)
+    loader = UnstructuredFileLoader(PDF_DIRECTORY + pdf_path)
     doc = loader.load()
     return doc
 
@@ -38,7 +37,7 @@ def save_texts() -> None:
                 cursor.execute(delete_table2_sql)
                 cursor.execute(delete_table3_sql)
                 
-                pdf_files = [f for f in os.listdir(pdf_directory) if f.lower().endswith('.pdf')]
+                pdf_files = [f for f in os.listdir(PDF_DIRECTORY) if f.lower().endswith('.pdf')]
                 for idx, pdf_file in enumerate(pdf_files):
                     pdf_data = doc_loader(pdf_path=pdf_file)
                     
@@ -47,7 +46,7 @@ def save_texts() -> None:
                         VALUES (:sample_id, :sample_name)
                     """
 
-                    cursor.execute(insert_table1_sql, sample_id=idx+1, sample_name=pdf_data[0].metadata['source'].replace(pdf_directory, ""))
+                    cursor.execute(insert_table1_sql, sample_id=idx+1, sample_name=pdf_data[0].metadata['source'].replace(PDF_DIRECTORY, ""))
                     print(f"Insert data {idx+1} to table1")
                 
                     insert_table2_sql = f"""

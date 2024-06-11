@@ -21,7 +21,7 @@ DSN = os.environ.get("DSN")
 OCI_CONFIG_FILE = os.environ["OCI_CONFIG_FILE"]
 OCI_CONFIG_PROFILE = os.environ["CONFIG_PROFILE"]
 OCI_COMPARTMENT_ID = os.environ["OCI_COMPARTMENT_ID"]
-
+PDF_DIRECTORY = os.environ.get("PDF_DIRECTORY_PATH")
 
 config = oci.config.from_file(file_location="~/.oci/config", profile_name=OCI_CONFIG_PROFILE)
 generative_ai_inference_client = GenerativeAiInferenceClient(config)
@@ -74,10 +74,8 @@ async def chat_command_r(
     chat_response = generative_ai_inference_client.chat(chat_detail)
     return chat_response.data.chat_response.text
 
-
-pdf_directory = './data/'
 def doc_loader(pdf_path: str) -> np.ndarray:
-    loader = UnstructuredFileLoader(pdf_directory + pdf_path.strip("'"))
+    loader = UnstructuredFileLoader(PDF_DIRECTORY + pdf_path.strip("'"))
     doc = loader.load()
     return doc
 
@@ -86,7 +84,7 @@ def create_documents(pdf_files: np.ndarray) -> np.ndarray:
     for idx, pdf_file in enumerate(pdf_files):
         pdf_data = doc_loader(pdf_path=pdf_file)
         documents.append(
-            { "title": pdf_data[0].metadata['source'].replace(pdf_directory, "").replace('.pdf', ""), "text": pdf_data[0].page_content })
+            { "title": pdf_data[0].metadata['source'].replace(PDF_DIRECTORY, "").replace('.pdf', ""), "text": pdf_data[0].page_content })
     return documents
 
 @app.get('/chat_doc/')
