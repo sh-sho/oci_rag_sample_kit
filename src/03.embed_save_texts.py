@@ -160,8 +160,6 @@ def embed_text(texts: np.ndarray) -> np.ndarray:
 @timer
 def handle_chunk(batch: np.ndarray) -> None:
     """chunks to Vector and CSV"""
-    print(f"handle_chunk {batch}")
-
     try:
         chunks_id = batch[td.table3_index["index_chunkid"]].tolist()
         texts = batch[td.table3_index["index_chunk"]].tolist()

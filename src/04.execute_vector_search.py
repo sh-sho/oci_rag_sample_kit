@@ -14,8 +14,6 @@ UN = os.environ.get("UN")
 PW = os.environ.get("PW")
 DSN = os.environ.get("DSN")
 
-
-
 def query_text(text: str):
     embed_text = array.array('f', utils.embed_documents([text])[0])
 
@@ -34,11 +32,11 @@ def query_text(text: str):
                 JOIN
                     {td.table1_name} pt ON ct.{td.table3_index["index_id"]} = pt.{td.table1_index["index_id"]}
                 ORDER BY distance
-                FETCH FIRST 5 ROWS ONLY
+                FETCH FIRST 3 ROWS ONLY
             """
             cursor.execute(select_sql, [embed_text])
 
-            print(f"============検索結果============")
+            print(f"============Result============")
             index = 1
             for row in cursor:
                 print(f"{index}: {row}")
@@ -51,5 +49,5 @@ def query_text(text: str):
 if __name__ == "__main__":
     args = sys.argv
     query = args[1]
-    print(f"検索テキスト：{query}")
+    print(f"Search Query：{query}")
     query_text(query)

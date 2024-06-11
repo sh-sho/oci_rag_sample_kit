@@ -61,7 +61,7 @@ async def vector_search(
 @app.get("/chat/")
 async def chat_command_r(
     input_text: str = 'Hello'
-):
+) -> str:
     chat_detail = ChatDetails(
         chat_request=CohereChatRequest(
             message=input_text,
@@ -91,7 +91,7 @@ def create_documents(pdf_files: np.ndarray) -> np.ndarray:
 async def chat_command_r_documents(
     input_text: str = 'Hello', 
     pdf_files: str = None
-    ):
+    ) -> str:
     documents = create_documents(pdf_files=[pdf_files])
     chat_detail = ChatDetails(
         chat_request=CohereChatRequest(
