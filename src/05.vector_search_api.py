@@ -68,7 +68,7 @@ async def vector_search(
                 JOIN
                     {td.table1_name} pt ON ct.{td.table3_index["index_id"]} = pt.{td.table1_index["index_id"]}
                 ORDER BY distance
-                FETCH FIRST 1 ROWS ONLY
+                FETCH FIRST 5 ROWS ONLY
             """
             cursor.execute(select_sql, [embed_text])
             results = cursor.fetchall()
