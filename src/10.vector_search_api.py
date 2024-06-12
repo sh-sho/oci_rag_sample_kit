@@ -5,6 +5,7 @@ from dotenv import load_dotenv, find_dotenv
 from fastapi import FastAPI
 import uvicorn
 import numpy as np
+import re
 from langchain_community.document_loaders import UnstructuredFileLoader
 import oci.config
 from oci.generative_ai_inference import GenerativeAiInferenceClient
@@ -25,6 +26,21 @@ PDF_DIRECTORY = os.environ.get("PDF_DIRECTORY_PATH")
 
 config = oci.config.from_file(file_location="~/.oci/config", profile_name=OCI_CONFIG_PROFILE)
 generative_ai_inference_client = GenerativeAiInferenceClient(config)
+
+preamble = """
+## 指示とコンテキスト
+
+あなたは、人々の質問やその他のリクエストにインタラクティブに答える手助けをしてください。
+あなたは、あらゆる種類のトピックに関する非常に幅広い要求を尋ねられます。
+幅広い検索エンジンや類似のツールが用意されているので、それらを使って答えを調べてください。
+
+ユーザーのニーズにできる限り応えてください。
+
+## 回答のスタイル
+
+ユーザーから別の回答スタイルを要求されない限り、適切文法とスペルを使い、完全な文章で回答する必要があります。
+最低でも100文字以上で回答してください。
+"""
 
 app = FastAPI()
 
@@ -64,15 +80,17 @@ async def chat_command_r(
 ) -> str:
     chat_detail = ChatDetails(
         chat_request=CohereChatRequest(
+            preamble_override=preamble,
             message=input_text,
-            max_tokens=500
+            max_tokens=1000
             ),
         compartment_id=OCI_COMPARTMENT_ID,
         serving_mode=OnDemandServingMode(
             model_id="cohere.command-r-16k"
         ))
     chat_response = generative_ai_inference_client.chat(chat_detail)
-    return chat_response.data.chat_response.text
+    result = re.sub(re.compile('<.*?>'), '', chat_response.data.chat_response.text.replace('\n', ' '))
+    return result
 
 def doc_loader(pdf_path: str) -> np.ndarray:
     loader = UnstructuredFileLoader(PDF_DIRECTORY + pdf_path.strip("'"))
@@ -95,17 +113,18 @@ async def chat_command_r_documents(
     documents = create_documents(pdf_files=[pdf_files])
     chat_detail = ChatDetails(
         chat_request=CohereChatRequest(
+            preamble_override=preamble,
             documents=documents,
             message=input_text,
-            max_tokens=500
+            max_tokens=1000
             ),
         compartment_id=OCI_COMPARTMENT_ID,
         serving_mode=OnDemandServingMode(
             model_id="cohere.command-r-16k"
         ))
     chat_response = generative_ai_inference_client.chat(chat_detail)
-    # return chat_response.data.chat_response.citations[0].document_ids[0]
-    return chat_response.data.chat_response.text
+    result = re.sub(re.compile('<.*?>'), '', chat_response.data.chat_response.text.replace('\n', '  '))
+    return result
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000, log_level="debug")
