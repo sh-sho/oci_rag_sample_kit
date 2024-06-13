@@ -115,7 +115,7 @@ async def chat_command_r_documents(
         chat_request=CohereChatRequest(
             preamble_override=preamble,
             documents=documents,
-            message=cparams.input_text,
+            message=cparams.prompt,
             max_tokens=cparams.max_tokens,
             temperature=cparams.temperature,
             top_k=cparams.top_k,

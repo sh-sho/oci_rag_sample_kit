@@ -21,18 +21,34 @@ def doc_search(prompt: str) -> str:
 chat_doc_api_url = "http://localhost:8000/chat_doc/"
 def chat_doc_response(cparams: ChatParams) -> str:
     cparams.pdf_files = doc_search(prompt=cparams.prompt)
-    chat_doc_api_params = {"input_text": {cparams.prompt}, "pdf_files": {cparams.pdf_files} }
-    chat_doc_api_response = requests.get(url=chat_doc_api_url, params=chat_doc_api_params)
+    chat_doc_api_params = {
+        "prompt": cparams.prompt,
+        "max_tokens": cparams.max_tokens,
+        "temperature": cparams.temperature,
+        "top_k": cparams.top_k,
+        "top_p": cparams.top_p,
+        "frequency_penalty": cparams.frequency_penalty,
+        "presence_penalty": cparams.presence_penalty,
+        "pdf_files": cparams.pdf_files
+    }
+    chat_doc_api_response = requests.get(url=chat_doc_api_url, json=chat_doc_api_params)
     return chat_doc_api_response.text
 
-
-max_tokens = st.sidebar.slider('Max_tokens', 0, 1000, 100, 10)
+max_tokens = st.sidebar.slider('Max_tokens', 0, 1000, 500, 10)
 temperature = st.sidebar.slider('Temperature', 0.0, 1.0, 0.1, 0.1)
 top_k = st.sidebar.slider('Top_k', 0, 500, 1, 1)
 top_p = st.sidebar.slider('Top_p', 0.01, 0.99, 0.75, 0.01)
 frequency_penalty = st.sidebar.slider('Frequency_penalty', 0.0, 1.0, 0.0, 0.1)
 presence_penalty = st.sidebar.slider('Presence_penalty', 0.0, 1.0, 0.0, 0.1)
-cparams = ChatParams(max_tokens, temperature, top_k, top_p, frequency_penalty, presence_penalty)
+
+cparams = ChatParams(
+    max_tokens=max_tokens,
+    temperature=temperature,
+    top_k=top_k,
+    top_p=top_p,
+    frequency_penalty=frequency_penalty,
+    presence_penalty=presence_penalty
+)
 
 st.title("OCI Chat Bot")
 
