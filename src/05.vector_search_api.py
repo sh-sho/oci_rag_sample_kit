@@ -13,6 +13,7 @@ from oci.generative_ai_inference.models import ChatDetails, CohereChatRequest, O
 
 import utils
 import table_detail as td
+from chatclass import ChatParams
 
 _ = load_dotenv(find_dotenv())
 oracledb.init_oracle_client()
@@ -107,16 +108,20 @@ def create_documents(pdf_files: np.ndarray) -> np.ndarray:
 
 @app.get('/chat_doc/')
 async def chat_command_r_documents(
-    input_text: str = 'Hello', 
-    pdf_files: str = None
+    cparams: ChatParams
     ) -> str:
-    documents = create_documents(pdf_files=[pdf_files])
+    documents = create_documents(pdf_files=[cparams.pdf_files])
     chat_detail = ChatDetails(
         chat_request=CohereChatRequest(
             preamble_override=preamble,
             documents=documents,
-            message=input_text,
-            max_tokens=1000
+            message=cparams.prompt,
+            max_tokens=cparams.max_tokens,
+            temperature=cparams.temperature,
+            top_k=cparams.top_k,
+            top_p=cparams.top_p,
+            frequency_penalty=cparams.frequency_penalty,
+            presence_penalty=cparams.presence_penalty,
             ),
         compartment_id=OCI_COMPARTMENT_ID,
         serving_mode=OnDemandServingMode(
