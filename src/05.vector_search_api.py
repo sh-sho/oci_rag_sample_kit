@@ -9,7 +9,7 @@ import re
 from langchain_community.document_loaders import UnstructuredFileLoader
 import oci.config
 from oci.generative_ai_inference import GenerativeAiInferenceClient
-from oci.generative_ai_inference.models import ChatDetails, CohereChatRequest, OnDemandServingMode, CohereTool, CohereParameterDefinition, CohereUserMessage, CohereChatBotMessage
+from oci.generative_ai_inference.models import ChatDetails, CohereChatRequest, OnDemandServingMode
 
 import utils
 import table_detail as td
