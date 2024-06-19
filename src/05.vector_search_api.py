@@ -27,7 +27,7 @@ PDF_DIRECTORY = os.environ.get("PDF_DIRECTORY_PATH")
 
 config = oci.config.from_file(file_location="~/.oci/config", profile_name=OCI_CONFIG_PROFILE)
 generative_ai_inference_client = GenerativeAiInferenceClient(config)
-
+chat_model = "cohere.command-r-plus"
 preamble = """
 ## 指示とコンテキスト
 
@@ -87,7 +87,7 @@ async def chat_command_r(
             ),
         compartment_id=OCI_COMPARTMENT_ID,
         serving_mode=OnDemandServingMode(
-            model_id="cohere.command-r-16k"
+            model_id=chat_model
         ))
     chat_response = generative_ai_inference_client.chat(chat_detail)
     result = re.sub(re.compile('<.*?>'), '', chat_response.data.chat_response.text.replace('\n', ' '))
@@ -125,7 +125,7 @@ async def chat_command_r_documents(
             ),
         compartment_id=OCI_COMPARTMENT_ID,
         serving_mode=OnDemandServingMode(
-            model_id="cohere.command-r-16k"
+            model_id=chat_model
         ))
     chat_response = generative_ai_inference_client.chat(chat_detail)
     result = re.sub(re.compile('<.*?>'), '', chat_response.data.chat_response.text.replace('\n', '  '))
