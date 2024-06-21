@@ -30,7 +30,7 @@
 
 
 ## OCIの環境構築
-以下の内容はアーキテクチャを構築を構築した上で実行してください。
+以下の内容は上記のアーキテクチャを構築した上で実行してください。
 
 ### GitリポジトリのClone
 今回使うソースコードはこのGitHubに公開しています。
@@ -41,7 +41,7 @@ https://github.com/sh-sho/oci_rag_sample_kit
 ```bash
 $ git clone https://github.com/sh-sho/oci_rag_sample_kit.git
 ```
-この記事では`src`ディレクトリで作業を行います。`src`に移動します。
+`src`ディレクトリで作業を行います。
 ```bash
 $ cd oci_rag_sample_kit/src/
 $ tree -a
