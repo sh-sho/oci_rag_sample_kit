@@ -134,8 +134,8 @@ End Creating Table.
 ```
 
 # 2. pdfデータのInsert
-`data/`配下のpdfのデータをTableにInsertします。
-`data/`配下には以下のようなサンプルのpdfが置かれています。
+`data/`のディレクトリ下のpdfデータをTableにInsertします。
+`data/`には以下のようなサンプルのpdfが置かれています。
 ```bash
 $ tree ./data/
 ./data/
