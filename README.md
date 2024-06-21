@@ -1,7 +1,9 @@
 # oci_rag_sample_kit
 
 # 概要
-このコードkitはOCI上でOCI Generative AIとOracle Database 23aiを使ったチャットアプリを作成するコードです。[こちら](https://qiita.com/sh-sho/items/b0afa8452f4790053a69)のQiitaで使用しているコードです。
+このコードkitはOCI上でOCI Generative AIとOracle Database 23aiを使い、RAGの技術を応用したチャットアプリを作成するコードです。このkitを実行すると以下の画像のようなチャットアプリを構築することができます。[こちら](https://qiita.com/sh-sho/items/b0afa8452f4790053a69)のQiitaで使用しているコードです。
+
+<img src="https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/2633103/894fa427-7928-dfae-180f-8828a0739278.png" width="100%">
 
 # アーキテクチャ
 以下のようなアーキテクチャを考えます。Base Databaseにpdfのデータをベクトル化して保存します。Virtual Machine上でベクトル検索を行うAPIの提供とチャット画面となるアプリを起動させます。
