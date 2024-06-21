@@ -160,7 +160,7 @@ End Insert data
 ```
 
 # 3. Textデータのベクトル化
-pdfのデータをchunkに分割しベクトル化してTableに保存します
+pdfのデータをchunkに分割しベクトル化してTableに保存します。
 `03.embed_save_texts.py`のコードを実行すると、以下のような出力が得られます。
 ```bash
 $ python 03.embed_save_texts.py 
